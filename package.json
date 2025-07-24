@@ -1,0 +1,22 @@
+{
+  "name": "Heartfelt",
+  "version": "0.1.0",
+  "description": "A discord bot about affection and kindness",
+  "main": "dist/index.js",
+  "scripts": {
+    "dev": "tsx watch src/index.ts",
+    "build": "tsc",
+    "start": "node ."
+  },
+  "author": "WolferTamer",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/node": "^20.14.2",
+    "dotenv": "^17.2.0",
+    "tsx": "^4.13.0"
+  },
+  "dependencies": {
+    "discord.js": "^14.21.0",
+    "mongoose": "^8.16.4"
+  }
+}
