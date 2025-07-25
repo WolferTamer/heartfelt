@@ -1,5 +1,5 @@
 import { Collection, Events, Interaction } from "discord.js";
-
+import UserModel from '../utils/schema';
 module.exports = {
 	name: Events.InteractionCreate,
 	once: false,
@@ -33,9 +33,24 @@ module.exports = {
 
         timestamps.set(interaction.user.id, now);
         setTimeout(() => timestamps.delete(interaction.user.id),cooldownAmount)
+
+        let profileData
+        try{
+            profileData = await UserModel.findOne({userid:interaction.user.id});
+            if(!profileData) {
+                let profile = await UserModel.create({
+                    userid: interaction.user.id
+                });
+                profile.save();
+                profileData = await UserModel.findOne({userid:interaction.user.id});
+            }
+        } catch (e) {
+            console.log(e)
+        }
+
         try {
             //Try running the command. Respond using the return value
-            await command.execute(interaction);
+            await command.execute(interaction, profileData);
             
         } catch (error) {
             console.error(error);

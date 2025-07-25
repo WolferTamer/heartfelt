@@ -29,10 +29,10 @@ client.on('ready', () => {
 })
 
 //Connect to the database
-/*mongoose.connect(process.env.MONGODB_SRV!).then(async()=> {
+mongoose.connect(process.env.MONGODB_SRV!).then(async()=> {
     console.log('Connected to the database!');
 }).catch((err)=> {
     console.log(err);
-});*/
+});
 
 client.login(process.env.TOKEN)

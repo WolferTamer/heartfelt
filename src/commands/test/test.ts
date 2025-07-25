@@ -1,4 +1,4 @@
-import { ChatInputCommandInteraction, CommandInteraction, EmbedBuilder, SlashCommandBuilder, SlashCommandUserOption } from "discord.js";
+import { ChatInputCommandInteraction, CommandInteraction, EmbedBuilder, Message, SlashCommandBuilder, SlashCommandUserOption, User } from "discord.js";
 
 module.exports = {
     embed: new EmbedBuilder()
@@ -11,10 +11,12 @@ module.exports = {
 	data: new SlashCommandBuilder()
 		.setName('test')
 		.setDescription('test command!')
-        .addStringOption((option)=>option.setName('item').setDescription('The item you wish to get')
+        .addUserOption((option)=>option.setName('item').setDescription('The item you wish to get')
             .setRequired(true)),
-	async execute(interaction: ChatInputCommandInteraction, profileData: any) {
-        
-		interaction.reply("hi");
+	async execute(interaction: ChatInputCommandInteraction | Message, profileData: any, inputs: {[key: string]: any}) {
+
+        let item : User = inputs ? inputs["item"] : (interaction as ChatInputCommandInteraction).options.getUser('item', true)
+
+		interaction.reply(`${item}`);
 	},
 };
