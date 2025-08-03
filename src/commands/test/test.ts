@@ -1,22 +1,20 @@
 import { ChatInputCommandInteraction, CommandInteraction, EmbedBuilder, Message, SlashCommandBuilder, SlashCommandUserOption, User } from "discord.js";
 
 module.exports = {
+    locked: true,
     embed: new EmbedBuilder()
-        .setTitle('giveitem')
-        .setDescription('Only admins can use this command to cheat in items to a specific player inventory')
-        .setFields([{name:'[Id]',value:'The ID of the item you want to cheat in.'},
-            {name:'[Amount]',value:'The amount of items to give.'},
-            {name:'{User}',value:'The user you want to give the items to. By default it gives it to the player using the command.'}
-        ]),
+        .setTitle('test')
+        .setDescription('Test a specific command')
+        .setFields([{name:'[Respond]',value:'What the bot will reply to the message with. Allows for the bot to be used for command testing.'}]),
 	data: new SlashCommandBuilder()
 		.setName('test')
 		.setDescription('test command!')
-        .addUserOption((option)=>option.setName('item').setDescription('The item you wish to get')
+        .addStringOption((option)=>option.setName('respond').setDescription('Try executing this command')
             .setRequired(true)),
 	async execute(interaction: ChatInputCommandInteraction | Message, profileData: any, inputs: {[key: string]: any}) {
 
-        let item : User = inputs ? inputs["item"] : (interaction as ChatInputCommandInteraction).options.getUser('item', true)
+        let item : string = inputs ? inputs["respond"] : (interaction as ChatInputCommandInteraction).options.getString('respond', true)
 
-		interaction.reply(`${item}`);
+		interaction.reply({content:item});
 	},
 };

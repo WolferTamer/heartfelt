@@ -8,6 +8,7 @@ if (process.env.NODE_ENV !== 'production') {
 
 module.exports = async (client: Client) => {
     let commands: any = [];
+    let guildCommands : any = []
 
     const foldersPath = path.join(__dirname, '../commands');
     const commandFolders = fs.readdirSync(foldersPath);
@@ -22,7 +23,10 @@ module.exports = async (client: Client) => {
             // Set a new item in the Collection with the key as the command name and the value as the exported module
             if ('data' in command && 'execute' in command) {
                 client.commands.set(command.data.name, command);
-                commands.push(command.data.toJSON());
+                guildCommands.push(command.data.toJSON());
+                if(!('locked' in command) || !command.locked) {
+                    commands.push(command.data.toJSON());
+                }
             } else {
                 console.log(`[WARNING] The command at ${filePath} is missing a required "data" or "execute" property.`);
             }
@@ -39,10 +43,11 @@ module.exports = async (client: Client) => {
 
             // The put method is used to fully refresh all commands in the guild with the current set
             if(process.env.GUILD) {
-                await rest.put(
+                const guilded : any = await rest.put(
                     Routes.applicationGuildCommands(process.env.CLIENT!, process.env.GUILD!),
-                    { body: commands },
+                    { body: guildCommands },
                 );
+                console.log(`Successfully reloaded ${guilded.length} Guild (/) commands.`);
             }
             const data : any = await rest.put(
                 Routes.applicationCommands(process.env.CLIENT!),

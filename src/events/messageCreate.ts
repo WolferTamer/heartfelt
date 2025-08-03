@@ -1,4 +1,5 @@
-import { ApplicationCommandOptionType, Events, Message, SlashCommandBuilder, User } from "discord.js";
+import { ApplicationCommandOptionType, Events, Message, SlashCommandBuilder, APIApplicationCommandOptionWithAutocompleteOrChoicesWrapper, APIApplicationCommandStringOption, APIApplicationCommandOptionChoice } from "discord.js";
+import {UserModel} from "../utils/schema";
 
 module.exports = {
     name: Events.MessageCreate,
@@ -6,6 +7,7 @@ module.exports = {
     async execute(message: Message) {
         if(!message.inGuild()) return;
         if(message.content.startsWith('>')) {
+            console.log(message.author.id)
             const params = message.content.match(/[^\s"']+|"([^"]*)"/g)
             console.log(params)
             if (params == null) {
@@ -28,9 +30,30 @@ module.exports = {
             let i = 1
             for(let opt of options) {
                 if(!params[i]) {
+                    if(!opt.toJSON().required) {
+                        break;
+                    }
                     message.reply("Parameters unusable")
                     return;
                 }
+                params[i] = params[i].replaceAll('"','')                
+                let choiceoption = (opt.toJSON() as APIApplicationCommandOptionWithAutocompleteOrChoicesWrapper<APIApplicationCommandStringOption,APIApplicationCommandOptionChoice>)
+
+                let matched = false
+                if(choiceoption.choices) {
+                    for (let choice of choiceoption.choices) {
+                        if(params[i] === choice.name || params[i] === choice.value) {
+                            matched = true;
+                            break;
+                        }
+                    }
+                    if(!matched) {
+                        message.reply(`${params[i]} does not match an existing choice.`)
+                        return;
+                    }
+                }
+
+                
 
                 switch(opt.toJSON().type) {
                     case ApplicationCommandOptionType.Integer: inputs[opt.toJSON().name] = parseInt(params[i]); break;
@@ -47,7 +70,21 @@ module.exports = {
                 
             }
 
-            command.execute(message,null,inputs)
+            let profileData
+            try{
+                profileData = await UserModel.findOne({userid:message.author.id});
+                if(!profileData) {
+                    let profile = await UserModel.create({
+                        userid: message.author.id
+                    });
+                    profile.save();
+                    profileData = await UserModel.findOne({userid:message.author.id});
+                }
+            } catch (e) {
+                console.log(e)
+            }
+
+            command.execute(message,profileData,inputs)
 
         }
     }

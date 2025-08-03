@@ -1,5 +1,5 @@
-import { Collection, Events, Interaction } from "discord.js";
-import UserModel from '../utils/schema';
+import { Collection, Events, Interaction, MessageFlags } from "discord.js";
+import {UserModel} from '../utils/schema';
 module.exports = {
 	name: Events.InteractionCreate,
 	once: false,
@@ -55,9 +55,9 @@ module.exports = {
         } catch (error) {
             console.error(error);
             if (interaction.replied || interaction.deferred) {
-                await interaction.followUp({ content: 'There was an error while executing this command!', ephemeral: true });
+                await interaction.followUp({ content: 'There was an error while executing this command!', flags: MessageFlags.Ephemeral });
             } else {
-                await interaction.reply({ content: 'There was an error while executing this command!', ephemeral: true });
+                await interaction.reply({ content: 'There was an error while executing this command!', flags: MessageFlags.Ephemeral });
             }
         }
     }
